@@ -1,3 +1,6 @@
+//https://github.com/iAmTinku/JwtAuthAspNet7WebAPI/tree/main
+//https://www.youtube.com/watch?v=KRVjIgr-WOU
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
