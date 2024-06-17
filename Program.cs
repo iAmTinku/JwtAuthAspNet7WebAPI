@@ -1,4 +1,4 @@
-//https://github.com/iAmTinku/JwtAuthAspNet7WebAPI/tree/main
+ //https://github.com/iAmTinku/JwtAuthAspNet7WebAPI/tree/main
 //https://www.youtube.com/watch?v=KRVjIgr-WOU
 //the Program.cs file is indeed one of the first files to run. It is responsible for setting up the application, configuring services,
 //and defining the request handling pipeline. The appsettings.json file is used for configuration, but it is read and utilized within
@@ -25,6 +25,8 @@ builder.Services.AddSwaggerGen();
 
 // add DB
 //This sets up the database context using Entity Framework Core, connecting to a SQL Server database.
+//Once configured through AddDbContext, ApplicationDbContext can be injected into other classes (like
+//controllers, services, etc.) that require database access
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
