@@ -3,8 +3,11 @@ using JwtAuthAspNet7WebAPI.Core.OtherObjects;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using System.CodeDom.Compiler;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text;
 
 namespace JwtAuthAspNet7WebAPI.Controllers
 {
@@ -62,7 +65,11 @@ namespace JwtAuthAspNet7WebAPI.Controllers
                 SecurityStamp = Guid.NewGuid().ToString(),
 
             };
-            // password is set here to invoke hasing process
+            // password is set here to invoke hashing process
+            //createAsync assocaites newUser with the new hashed password
+            //will be shown in db but the hashedpassword cannot be directly accessed for security
+            //reasons, however can be called with methods such as CheckPasswordAsync, which will 
+            //work against the hashed password stored in the database
             var createUserResult = await _userManager.CreateAsync(newUser, registerDto.Password);
             if(!createUserResult.Succeeded)
             {
@@ -123,7 +130,23 @@ namespace JwtAuthAspNet7WebAPI.Controllers
 
             var token = GeneratedNewJsonWebToken(authClaims);
             return Ok(token);
+
         }
 
+        private string GeneratedNewJsonWebToken(List<Claim> claims)
+        {
+            var authSecret = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
+            var tokenObject = new JwtSecurityToken(
+                issuer: _configuration["JWT:ValidIssuer"],
+                audience: _configuration["JWT:ValidAudience"],
+                expires: DateTime.Now.AddHours(1),
+                claims: claims,
+                signingCredentials: new SigningCredentials(authSecret, SecurityAlgorithms.HmacSha256)
+                );
+            string token = new JwtSecurityTokenHandler().WriteToken(tokenObject);
+            return token;
+        }
+        //we are using _configuration instead of builder.Configuration
     }
 }
+
