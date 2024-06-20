@@ -128,22 +128,25 @@ namespace JwtAuthAspNet7WebAPI.Controllers
                 authClaims.Add(new Claim(ClaimTypes.Role, userRole));
             }
 
-            var token = GeneratedNewJsonWebToken(authClaims);
+            var token = GenerateNewJsonWebToken(authClaims);
             return Ok(token);
 
         }
 
-        private string GeneratedNewJsonWebToken(List<Claim> claims)
+        private string GenerateNewJsonWebToken(List<Claim> claims)
         {
             var authSecret = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
+
             var tokenObject = new JwtSecurityToken(
-                issuer: _configuration["JWT:ValidIssuer"],
-                audience: _configuration["JWT:ValidAudience"],
-                expires: DateTime.Now.AddHours(1),
-                claims: claims,
-                signingCredentials: new SigningCredentials(authSecret, SecurityAlgorithms.HmacSha256)
+                    issuer: _configuration["JWT:ValidIssuer"],
+                    audience: _configuration["JWT:ValidAudience"],
+                    expires: DateTime.Now.AddHours(1),
+                    claims: claims,
+                    signingCredentials: new SigningCredentials(authSecret, SecurityAlgorithms.HmacSha256)
                 );
+
             string token = new JwtSecurityTokenHandler().WriteToken(tokenObject);
+
             return token;
         }
         //we are using _configuration instead of builder.Configuration
