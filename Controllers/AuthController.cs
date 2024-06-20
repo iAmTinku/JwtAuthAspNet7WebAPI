@@ -65,11 +65,14 @@ namespace JwtAuthAspNet7WebAPI.Controllers
                 SecurityStamp = Guid.NewGuid().ToString(),
 
             };
+
             // password is set here to invoke hashing process
             //createAsync assocaites newUser with the new hashed password
             //will be shown in db but the hashedpassword cannot be directly accessed for security
             //reasons, however can be called with methods such as CheckPasswordAsync, which will 
             //work against the hashed password stored in the database
+
+
             var createUserResult = await _userManager.CreateAsync(newUser, registerDto.Password);
             if(!createUserResult.Succeeded)
             {
@@ -148,8 +151,76 @@ namespace JwtAuthAspNet7WebAPI.Controllers
             string token = new JwtSecurityTokenHandler().WriteToken(tokenObject);
 
             return token;
+            //we are using _configuration instead of builder.Configuration
+
         }
-        //we are using _configuration instead of builder.Configuration
+
+        //Route -> make user -> admin
+        [HttpPost]
+        [Route("Make_Admin")]
+        public async Task<IActionResult> MakeAdmin([FromBody] UpdatePermissionDto updatePermissionDto)
+        {
+            var user = await _userManager.FindByNameAsync(updatePermissionDto.UserName);
+            if (user is null)
+            {
+                return BadRequest("Invalid User name!!");
+            }
+
+            await _userManager.AddToRoleAsync(user, StaticUserRoles.ADMIN);
+
+            var authClaims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim("JWTID", Guid.NewGuid().ToString()),
+            };
+
+            var userRoles = await _userManager.GetRolesAsync(user);
+            foreach (var userRole in userRoles)
+            {
+                authClaims.Add(new Claim(ClaimTypes.Role, userRole));
+            }
+
+            var token = GenerateNewJsonWebToken(authClaims);
+
+            return Ok(new { message = "User is now an Admin", token = token });
+        }
+
+        //Route -> make user -> owner
+        [HttpPost]
+        [Route("Make_Owner")]
+        public async Task<IActionResult> MakeOwner([FromBody] UpdatePermissionDto updatePermissionDto)
+        {
+            var user = await _userManager.FindByNameAsync(updatePermissionDto.UserName);
+            if (user is null)
+            {
+                return BadRequest("Invalid User name!!");
+            }
+            var isAdmin = await _userManager.IsInRoleAsync(user, StaticUserRoles.ADMIN);
+            if (!isAdmin)
+            {
+                return BadRequest("user must be admin before making as ownner");
+            }
+
+            await _userManager.AddToRoleAsync(user, StaticUserRoles.OWNER);
+
+            var authClaims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim("JWTID", Guid.NewGuid().ToString()),
+            };
+
+            var userRoles = await _userManager.GetRolesAsync(user);
+            foreach (var userRole in userRoles)
+            {
+                authClaims.Add(new Claim(ClaimTypes.Role, userRole));
+            }
+
+            var token = GenerateNewJsonWebToken(authClaims);
+
+            return Ok(new { message = "User is now an Owner", token = token });
+        }
     }
 }
 

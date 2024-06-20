@@ -92,8 +92,8 @@ app.UseHttpsRedirection();
 
 
 // These lines add the authentication and authorization middleware to the request pipeline, ensuring that authentication and authorization are handled properly for incoming requests.
-app.UseAuthorization();
 app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 

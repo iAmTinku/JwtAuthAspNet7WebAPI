@@ -25,7 +25,6 @@ namespace JwtAuthAspNet7WebAPI.Controllers
         [Route("GetUserRole")]
         [Authorize(Roles = StaticUserRoles.USER)]
 
-        //AUthorize is for roles authentication is to even get inside the home
         public IActionResult GetUserRoles()
         {
             return Ok(Summaries);
@@ -34,11 +33,14 @@ namespace JwtAuthAspNet7WebAPI.Controllers
         [HttpGet]
         [Route("GetAdminRole")]
         [Authorize(Roles = StaticUserRoles.ADMIN)]
+
         public IActionResult GetAdminRole()
         {
+            //SHould implement autorefresh of logging in with new JWT, or creating a new JWT
             return Ok(Summaries);
         }
 
+        //AUthorize is for roles authentication is to even get inside the home
         [HttpGet]
         [Route("GetOwnerRole")]
         [Authorize(Roles = StaticUserRoles.OWNER)]
