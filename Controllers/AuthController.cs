@@ -1,5 +1,6 @@
 ﻿using JwtAuthAspNet7WebAPI.Core.Dtos;
 using JwtAuthAspNet7WebAPI.Core.Entities;
+using JwtAuthAspNet7WebAPI.Core.Interface;
 using JwtAuthAspNet7WebAPI.Core.OtherObjects;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -16,9 +17,15 @@ namespace JwtAuthAspNet7WebAPI.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
+        private IAuthService _authservice;
+
+        public AuthController(IAuthService authService) { 
+        _authservice = authService;
+        }
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IConfiguration _configuration;
+
         public AuthController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration)
         {
             _userManager = userManager;
