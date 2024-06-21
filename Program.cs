@@ -6,6 +6,7 @@
 
 
 using JwtAuthAspNet7WebAPI.Core.DbContext;
+using JwtAuthAspNet7WebAPI.Core.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -36,7 +37,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 //This is done using the AddIdentity method, which sets up the default services for managing users, roles, and authentication.
 //The AddEntityFrameworkStores method tells Identity to use Entity Framework Core for storing user information.
 builder.Services
-    .AddIdentity<IdentityUser, IdentityRole>()
+    .AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
